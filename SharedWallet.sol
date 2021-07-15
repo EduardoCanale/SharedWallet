@@ -44,9 +44,22 @@ contract SharedWallet {
         require(userAccount[msg.sender].account_id != address(0), "You need to create a user first");
         _;
     }
+
+    modifier onlyCreator {
+        require(msg.sender == creator);
+        _;
+    }
+
+    // Variables //////////
+
+    address creator;
     
     // Functions //////////
     
+    constructor() {
+        creator = msg.sender;
+        createAccount();
+    }
     
     function createAccount() public {
         require(userAccount[msg.sender].account_id == address(0), "This address already has an account");
@@ -167,6 +180,10 @@ contract SharedWallet {
 
     receive() external payable {
         depositMoney();
+    }
+
+    function destroyContract () public onlyCreator accountCreated {
+        selfdestruct(payable(creator));
     }
     
 }
